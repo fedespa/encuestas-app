@@ -4,6 +4,7 @@ const UserSchema = new Schema({
     _id: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    isVerified: { type: Boolean, required: true },
     createdAt: { type: Date, default: Date.now }
 })
 

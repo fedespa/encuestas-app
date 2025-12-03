@@ -8,6 +8,7 @@ export class MongoUserRepository implements IUserRepository {
       _id: user.id,
       email: user.email,
       password: user.password,
+      isVerified: false,
       createdAt: user.createdAt,
     });
 
@@ -15,6 +16,7 @@ export class MongoUserRepository implements IUserRepository {
       id: doc._id,
       email: doc.email,
       password: doc.password,
+      isVerified: doc.isVerified,
       createdAt: doc.createdAt,
     });
   }
@@ -27,6 +29,7 @@ export class MongoUserRepository implements IUserRepository {
       id: doc._id,
       email: doc.email,
       password: doc.password,
+      isVerified: doc.isVerified,
       createdAt: doc.createdAt,
     });
   }
@@ -39,6 +42,7 @@ export class MongoUserRepository implements IUserRepository {
       id: doc._id,
       email: doc.email,
       password: doc.password,
+      isVerified: doc.isVerified,
       createdAt: doc.createdAt,
     });
   }

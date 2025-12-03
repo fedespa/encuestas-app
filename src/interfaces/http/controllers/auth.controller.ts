@@ -1,7 +1,7 @@
-import { RegisterUseCase } from "../../../application/auth/register.usecase.js";
+
 import type { Request, Response } from "express";
 import { EmailAlreadyExistsError } from "../../../domain/user/user.errors.js";
-import { AuthMapper } from "../mappers/auth/auth.mapper.js";
+import type { RegisterUseCase } from "../../../application/use-cases/auth/register.usecase.js";
 
 export class AuthController {
   constructor(
@@ -12,14 +12,12 @@ export class AuthController {
 
   public async register(req: Request, res: Response) {
     try {
-      const user = await this.deps.registerUseCase.execute({
+      const registerResponse = await this.deps.registerUseCase.execute({
         email: req.body.email,
         password: req.body.password,
       });
 
-      const response = AuthMapper.toRegisterVm(user);
-
-      return res.status(201).json(response);
+      return res.status(201).json(registerResponse);
     } catch (error: any) {
       if (error instanceof EmailAlreadyExistsError) {
         return res.status(400).json({ error: error.message });

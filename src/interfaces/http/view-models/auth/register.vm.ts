@@ -1,7 +1,6 @@
+import type { UserVm } from "../user/user.vm.js";
+
 export interface RegisterVm {
-  user: {
-    id: string;
-    email: string;
-  };
-  token: string;
+  user: UserVm
+  verificationUrl: string;
 }
