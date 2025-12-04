@@ -12,6 +12,8 @@ const createAuthRoutes = (authController: AuthController) => {
         (req,res) => authController.register(req,res)
     );
 
+    router.post("/verify", (req, res) => authController.verify(req,res))
+
     return router;
 };
 

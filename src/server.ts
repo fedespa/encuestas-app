@@ -2,9 +2,13 @@ import mongoose from "mongoose";
 import app from "./app.js";
 import createAuthRoutes from "./interfaces/http/routes/auth.routes.js";
 import { authController } from "./infrastructure/config/container.js";
+import { errorHandler } from "./interfaces/http/middlewares/error-handler.middleware.js";
 
 // Montar rutas con dependencias ya inyectadas
 app.use("/auth", createAuthRoutes(authController));
+
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT ?? 3000;
 const MONGO_URI =

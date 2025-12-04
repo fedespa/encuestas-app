@@ -3,6 +3,29 @@ import type { IUserRepository } from "../../../domain/user/user.repository.js";
 import { UserModel } from "../../db/mongo/user.model.js";
 
 export class MongoUserRepository implements IUserRepository {
+  async update(id: string, data: UserEntity): Promise<UserEntity> {
+    const updatedDoc = await UserModel.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          email: data.email,
+          password: data.password,
+          isVerified: data.isVerified,
+          createdAt: data.createdAt,
+        },
+      },
+      { new: true }
+    );
+
+    return UserEntity.create({
+      id: updatedDoc?._id!!,
+      email: updatedDoc?.email!!,
+      password: updatedDoc?.password!!,
+      createdAt: updatedDoc?.createdAt!!,
+      isVerified: updatedDoc?.isVerified!!
+    })
+  }
+
   async create(user: UserEntity): Promise<UserEntity> {
     const doc = await UserModel.create({
       _id: user.id,
