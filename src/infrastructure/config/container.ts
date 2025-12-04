@@ -1,3 +1,4 @@
+import { LoginUseCase } from "../../application/use-cases/auth/login.usecase.js";
 import { RegisterUseCase } from "../../application/use-cases/auth/register.usecase.js";
 import { VerifyEmailUseCase } from "../../application/use-cases/auth/verify-email.usecase.js";
 import { AuthController } from "../../interfaces/http/controllers/auth.controller.js";
@@ -35,8 +36,18 @@ const verifyEmailUseCase = new VerifyEmailUseCase(
   cryptoService
 );
 
+const loginUseCase = new LoginUseCase(
+    bcryptService,
+    userRepository,
+    jwtTokenService,
+    refreshTokenRepository,
+    cryptoService,
+    verificationTokenRepository
+)
+
 // 3. Inyectar Casos de Uso en los Controladores
 export const authController = new AuthController({
   registerUseCase,
-  verifyEmailUseCase
+  verifyEmailUseCase,
+  loginUseCase
 });

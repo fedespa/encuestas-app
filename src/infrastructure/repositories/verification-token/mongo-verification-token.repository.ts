@@ -42,4 +42,8 @@ export class MongoVerificationTokenRepository
   async deleteByToken(token: string): Promise<void> {
     await VerificationTokenModel.deleteOne({ token });
   }
+  async deleteAllByUserId(userId: string): Promise<void> {
+    await VerificationTokenModel.deleteMany({ userId })
+  }
+
 }

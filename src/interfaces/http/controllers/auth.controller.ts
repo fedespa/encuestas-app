@@ -1,21 +1,23 @@
 import type { Request, Response } from "express";
-import { EmailAlreadyExistsError } from "../../../domain/user/user.errors.js";
 import type { RegisterUseCase } from "../../../application/use-cases/auth/register.usecase.js";
 import type { VerifyEmailUseCase } from "../../../application/use-cases/auth/verify-email.usecase.js";
 import { VerificationTokenNotProvidedError } from "../../../domain/verification-token/verification-token.errors.js";
+import type { LoginUseCase } from "../../../application/use-cases/auth/login.usecase.js";
 
 export class AuthController {
   constructor(
     private readonly deps: {
       registerUseCase: RegisterUseCase;
       verifyEmailUseCase: VerifyEmailUseCase;
+      loginUseCase: LoginUseCase;
     }
   ) {}
 
   public async register(req: Request, res: Response) {
+    const { email, password } = req.body;
     const registerResponse = await this.deps.registerUseCase.execute({
-      email: req.body.email,
-      password: req.body.password,
+      email,
+      password,
     });
 
     return res.status(201).json(registerResponse);
@@ -33,6 +35,23 @@ export class AuthController {
     });
 
     const { user, accessToken, refreshToken } = result;
+
+    return res.status(200).json({
+      user,
+      accessToken,
+      refreshToken, // BORRAR DE ACA
+    });
+  }
+
+  public async login(req: Request, res: Response) {
+    const { email, password } = req.body;
+
+    const loginResponse = await this.deps.loginUseCase.execute({
+      email,
+      password,
+    });
+
+    const { user, accessToken, refreshToken } = loginResponse;
 
     return res.status(200).json({
       user,

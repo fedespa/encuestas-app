@@ -38,7 +38,7 @@ export class VerifyEmailUseCase {
     const user = await this.userRepository.findById(record.userId);
 
     if (!user) {
-      throw new UserNotFoundError(record.userId);
+      throw new UserNotFoundError();
     }
 
     user.isVerified = true;
@@ -51,7 +51,7 @@ export class VerifyEmailUseCase {
     });
 
     const refreshToken = await this.jwtService.generateRefreshToken({
-      userId: user.id,
+      userId: updatedUser.id,
     });
 
     this.refreshTokenRepository.create(RefreshTokenEntity.create({
