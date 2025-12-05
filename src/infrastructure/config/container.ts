@@ -2,6 +2,7 @@ import { LoginUseCase } from "../../application/use-cases/auth/login.usecase.js"
 import { RegisterUseCase } from "../../application/use-cases/auth/register.usecase.js";
 import { VerifyEmailUseCase } from "../../application/use-cases/auth/verify-email.usecase.js";
 import { AuthController } from "../../interfaces/http/controllers/auth.controller.js";
+import { SurveyController } from "../../interfaces/http/controllers/survey.controller.js";
 import { MongoRefreshTokenRepository } from "../repositories/refresh-token/mongo-refresh-token.repository.js";
 import { MongoUserRepository } from "../repositories/user/mongo-user.repository.js";
 import { MongoVerificationTokenRepository } from "../repositories/verification-token/mongo-verification-token.repository.js";
@@ -51,3 +52,7 @@ export const authController = new AuthController({
   verifyEmailUseCase,
   loginUseCase
 });
+
+export const surveyController = new SurveyController({
+  
+})
