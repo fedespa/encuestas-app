@@ -4,7 +4,7 @@ import type { IUserRepository } from "../../../domain/user/user.repository.js";
 import { VerificationTokenEntity } from "../../../domain/verification-token/verification-token.entity.js";
 import type { IVerificationTokenRepository } from "../../../domain/verification-token/verification-token.repository.js";
 import type { RegisterVm } from "../../../interfaces/http/view-models/auth/register.vm.js";
-import { UserMapper } from "../../mappers/user/user.mapper.js";
+import { UserMapper } from "../../mappers/user/user.vm.mapper.js";
 import type { HashService } from "../../services/hash.service.js";
 import type { TokenService } from "../../services/token.service.js";
 
@@ -41,7 +41,7 @@ export class RegisterUseCase {
 
     const verificationToken = VerificationTokenEntity.create({
       id: this.tokenService.generateUUID(),
-      userId: user.id,
+      userId: user.getId(),
       token: newToken,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
       createdAt: new Date()

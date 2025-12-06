@@ -4,10 +4,10 @@ import type { UserVm } from "../../../interfaces/http/view-models/user/user.vm.j
 export class UserMapper {
   static toVm(entity: UserEntity): UserVm {
     return {
-      id: entity.id,
-      email: entity.email,
-      isVerified: entity.isVerified,
-      createdAt: entity.createdAt.toISOString(),
+      id: entity.getId(),
+      email: entity.getEmail(),
+      isVerified: entity.getIsVerified(),
+      createdAt: entity.getCreatedAt().toISOString(),
     };
   }
 }

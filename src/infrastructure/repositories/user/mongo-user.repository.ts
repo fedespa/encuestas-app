@@ -1,72 +1,34 @@
 import { UserEntity } from "../../../domain/user/user.entity.js";
 import type { IUserRepository } from "../../../domain/user/user.repository.js";
 import { UserModel } from "../../db/mongo/user.model.js";
+import { UserPersistenceMapper } from "../../mappers/user.persistence.mapper.js";
 
 export class MongoUserRepository implements IUserRepository {
   async update(id: string, data: UserEntity): Promise<UserEntity> {
-    const updatedDoc = await UserModel.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          email: data.email,
-          password: data.password,
-          isVerified: data.isVerified,
-          createdAt: data.createdAt,
-        },
-      },
-      { new: true }
-    );
+    const persistence = UserPersistenceMapper.toPersistence(data);
 
-    return UserEntity.create({
-      id: updatedDoc?._id!!,
-      email: updatedDoc?.email!!,
-      password: updatedDoc?.password!!,
-      createdAt: updatedDoc?.createdAt!!,
-      isVerified: updatedDoc?.isVerified!!
-    })
+    await UserModel.updateOne({ _id: id }, persistence);
+    return data;
   }
 
   async create(user: UserEntity): Promise<UserEntity> {
-    const doc = await UserModel.create({
-      _id: user.id,
-      email: user.email,
-      password: user.password,
-      isVerified: false,
-      createdAt: user.createdAt,
-    });
+    const persistence = UserPersistenceMapper.toPersistence(user);
+    await UserModel.create(persistence);
 
-    return UserEntity.create({
-      id: doc._id,
-      email: doc.email,
-      password: doc.password,
-      isVerified: doc.isVerified,
-      createdAt: doc.createdAt,
-    });
+    return user;
   }
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const doc = await UserModel.findOne({ email });
     if (!doc) return null;
 
-    return UserEntity.create({
-      id: doc._id,
-      email: doc.email,
-      password: doc.password,
-      isVerified: doc.isVerified,
-      createdAt: doc.createdAt,
-    });
+    return UserPersistenceMapper.toEntity(doc);
   }
 
   async findById(id: string): Promise<UserEntity | null> {
     const doc = await UserModel.findById(id);
     if (!doc) return null;
 
-    return UserEntity.create({
-      id: doc._id,
-      email: doc.email,
-      password: doc.password,
-      isVerified: doc.isVerified,
-      createdAt: doc.createdAt,
-    });
+    return UserPersistenceMapper.toEntity(doc);
   }
 }

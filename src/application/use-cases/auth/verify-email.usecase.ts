@@ -8,7 +8,7 @@ import {
 } from "../../../domain/verification-token/verification-token.errors.js";
 import type { IVerificationTokenRepository } from "../../../domain/verification-token/verification-token.repository.js";
 import type { LoginVm } from "../../../interfaces/http/view-models/auth/login.vm.js";
-import { UserMapper } from "../../mappers/user/user.mapper.js";
+import { UserMapper } from "../../mappers/user/user.vm.mapper.js";
 import type { JwtService } from "../../services/jwt.service.js";
 import type { TokenService } from "../../services/token.service.js";
 
@@ -30,33 +30,33 @@ export class VerifyEmailUseCase {
       throw new VerificationTokenNotFoundError();
     }
 
-    if (record.expiresAt < new Date()) {
+    if (record.isExpired()) {
       await this.verificationTokenRepository.deleteByToken(input.token);
       throw new VerificationTokenExpiredError();
     }
 
-    const user = await this.userRepository.findById(record.userId);
+    const user = await this.userRepository.findById(record.getUserId());
 
     if (!user) {
       throw new UserNotFoundError();
     }
 
-    user.isVerified = true;
-    const updatedUser = await this.userRepository.update(user.id, user);
+    user.verifyEmail();
+    const updatedUser = await this.userRepository.update(user.getId(), user);
 
     await this.verificationTokenRepository.deleteByToken(input.token);
 
     const accessToken = await this.jwtService.generateAccessToken({
-      userId: updatedUser.id,
+      userId: updatedUser.getId(),
     });
 
     const refreshToken = await this.jwtService.generateRefreshToken({
-      userId: updatedUser.id,
+      userId: updatedUser.getId(),
     });
 
     this.refreshTokenRepository.create(RefreshTokenEntity.create({
       id: this.tokenService.generateUUID(),
-      userId: updatedUser.id,
+      userId: updatedUser.getId(),
       token: refreshToken,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
     }))

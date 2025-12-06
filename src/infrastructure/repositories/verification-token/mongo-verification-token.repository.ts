@@ -1,6 +1,7 @@
 import { VerificationTokenEntity } from "../../../domain/verification-token/verification-token.entity.js";
 import type { IVerificationTokenRepository } from "../../../domain/verification-token/verification-token.repository.js";
 import { VerificationTokenModel } from "../../db/mongo/verification-token.model.js";
+import { VerificationTokenPersistenceMapper } from "../../mappers/verification-token.persistence.mapper.js";
 
 export class MongoVerificationTokenRepository
   implements IVerificationTokenRepository
@@ -8,42 +9,23 @@ export class MongoVerificationTokenRepository
   async create(
     verificationToken: VerificationTokenEntity
   ): Promise<VerificationTokenEntity> {
-    const doc = await VerificationTokenModel.create({
-      _id: verificationToken.id,
-      userId: verificationToken.userId,
-      token: verificationToken.token,
-      expiresAt: verificationToken.expiresAt,
-      createdAt: verificationToken.createdAt,
-    });
+    const persistence =
+      VerificationTokenPersistenceMapper.toPersistence(verificationToken);
+    await VerificationTokenModel.create(persistence);
 
-    return VerificationTokenEntity.create({
-      id: doc._id,
-      userId: doc.userId,
-      token: doc.token,
-      expiresAt: doc.expiresAt,
-      createdAt: doc.createdAt,
-    });
+    return verificationToken;
   }
-
   async findByToken(token: string): Promise<VerificationTokenEntity | null> {
     const doc = await VerificationTokenModel.findOne({ token });
 
     if (!doc) return null;
 
-    return VerificationTokenEntity.create({
-      id: doc._id,
-      userId: doc.userId,
-      token: doc.token,
-      expiresAt: doc.expiresAt,
-      createdAt: doc.createdAt,
-    });
+    return VerificationTokenPersistenceMapper.toEntity(doc);
   }
-
   async deleteByToken(token: string): Promise<void> {
     await VerificationTokenModel.deleteOne({ token });
   }
   async deleteAllByUserId(userId: string): Promise<void> {
-    await VerificationTokenModel.deleteMany({ userId })
+    await VerificationTokenModel.deleteMany({ userId });
   }
-
 }
