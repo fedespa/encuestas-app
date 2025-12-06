@@ -22,26 +22,27 @@ export class VerifyEmailUseCase {
   ) {}
 
   async execute(input: { token: string }): Promise<LoginVm> {
-    const record = await this.verificationTokenRepository.findByToken(
+    const verificationToken = await this.verificationTokenRepository.findByToken(
       input.token
     );
 
-    if (!record) {
+    if (!verificationToken) {
       throw new VerificationTokenNotFoundError();
     }
 
-    if (record.isExpired()) {
+    if (verificationToken.isExpired()) {
       await this.verificationTokenRepository.deleteByToken(input.token);
       throw new VerificationTokenExpiredError();
     }
 
-    const user = await this.userRepository.findById(record.getUserId());
+    const user = await this.userRepository.findById(verificationToken.getUserId());
 
     if (!user) {
       throw new UserNotFoundError();
     }
 
     user.verifyEmail();
+
     const updatedUser = await this.userRepository.update(user.getId(), user);
 
     await this.verificationTokenRepository.deleteByToken(input.token);

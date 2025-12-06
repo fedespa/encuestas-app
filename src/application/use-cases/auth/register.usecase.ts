@@ -44,10 +44,15 @@ export class RegisterUseCase {
       userId: user.getId(),
       token: newToken,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      createdAt: new Date()
+      createdAt: new Date(),
     });
 
-    await this.verificationTokenRepository.create(verificationToken);
+    try {
+      await this.verificationTokenRepository.create(verificationToken);
+    } catch (error) {
+      await this.userRepository.delete(newUser.getId())
+      throw error
+    }
 
     return {
       user: UserMapper.toVm(newUser),

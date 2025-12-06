@@ -4,6 +4,10 @@ import { UserModel } from "../../db/mongo/user.model.js";
 import { UserPersistenceMapper } from "../../mappers/user.persistence.mapper.js";
 
 export class MongoUserRepository implements IUserRepository {
+  async delete(id: string): Promise<void> {
+    await UserModel.deleteOne({ _id: id })
+  }
+
   async update(id: string, data: UserEntity): Promise<UserEntity> {
     const persistence = UserPersistenceMapper.toPersistence(data);
 
@@ -31,4 +35,5 @@ export class MongoUserRepository implements IUserRepository {
 
     return UserPersistenceMapper.toEntity(doc);
   }
+  
 }
