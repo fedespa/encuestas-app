@@ -4,8 +4,7 @@ export const QuestionTypeSchema = z.enum([
   "text",
   "number",
   "date",
-  "single-choice",
-  "multiple-choice",
+  "single_choice",
+  "multiple_choice",
   "rating",
-  "file",
 ]);

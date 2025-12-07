@@ -1,12 +1,12 @@
 export type ConditionOperator =
   | "equals"
-  | "not-equals"
-  | "greater-than"
-  | "less-than"
+  | "not_equals"
+  | "greater_than"
+  | "less_than"
   | "includes"
-  | "not-includes";
+  | "not_includes";
 
 export type LogicAction =
   | "show"
   | "hide"
-  | "jump-to";
+  | "jump_to";

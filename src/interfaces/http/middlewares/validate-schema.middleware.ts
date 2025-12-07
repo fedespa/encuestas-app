@@ -6,8 +6,15 @@ export const validateSchema = (schema: z.ZodType) => {
     const parsed = schema.safeParse(req.body);
 
     if (!parsed.success) {
+      const formattedErrors = parsed.error.issues.map((issue) => ({
+        message: issue.message,
+        path: issue.path.join("."), 
+        code: issue.code,
+      }));
+
       return res.status(400).json({
-        error: "Error en los datos!"
+        error: "Invalid request body",
+        details: formattedErrors
       });
     }
 

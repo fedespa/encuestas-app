@@ -10,4 +10,13 @@ export class MongoLogicRuleRepository implements ILogicRuleRepository {
 
     return logicRule;
   }
+
+  async createMany(logicRules: LogicRuleEntity[]): Promise<LogicRuleEntity[]>{
+    const persistenceList = logicRules.map(l => LogicRulePersistenceMapper.toPersistence(l));
+
+    await LogicRuleModel.insertMany(persistenceList);
+
+    return logicRules;
+  }
+
 }

@@ -8,18 +8,18 @@ const LogicRuleSchema = new Schema({
     type: String,
     enum: [
       "equals",
-      "not-equals",
-      "greater-than",
-      "less-than",
+      "not_equals",
+      "greater_than",
+      "less_than",
       "includes",
-      "not-includes",
+      "not_includes",
     ],
     required: true,
   },
   value: { type: Schema.Types.Mixed, required: true },
   action: {
     type: String,
-    enum: ["show", "hide", "jump-to"],
+    enum: ["show", "hide", "jump_to"],
     required: true,
   },
   targetQuestionId: { type: String, required: true }

@@ -2,8 +2,8 @@ export type QuestionType =
   | "text"
   | "number"
   | "date"
-  | "single-choice"
-  | "multiple-choice"
+  | "single_choice"
+  | "multiple_choice"
   | "rating"
 ;
 
@@ -12,5 +12,5 @@ export type QuestionOptions =
   | { type: "number" }
   | { type: "date" }
   | { type: "rating"; scale: number }     
-  | { type: "single-choice"; options: string[] }
-  | { type: "multiple-choice"; options: string[] };
+  | { type: "single_choice"; options: string[] }
+  | { type: "multiple_choice"; options: string[] };

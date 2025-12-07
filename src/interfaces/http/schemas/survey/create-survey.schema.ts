@@ -6,18 +6,13 @@ import { LogicActionSchema } from "../logic-rule/logic-action.schema.js";
 
 export const CreateSurveySchema = z.object({
   survey: z.object({
-    id: z.string().min(1),
     title: z.string(),
     description: z.string(),
     isPublic: z.boolean(),
-    createdAt: z.iso.datetime(),
-    updatedAt: z.iso.datetime(),
-    ownerId: z.string().optional(),
   }),
   questions: z.array(
     z.object({
-      id: z.string().min(1),
-      surveyId: z.string().min(1),
+      tempId: z.string().min(1),
       type: QuestionTypeSchema,
       questionText: z.string(),
       required: z.boolean(),
@@ -27,13 +22,11 @@ export const CreateSurveySchema = z.object({
   ),
   logicRules: z.array(
     z.object({
-      id: z.string().min(1),
-      surveyId: z.string().min(1),
-      sourceQuestionId: z.string().min(1),
+      sourceTempId: z.string().min(1),
       operator: ConditionOperatorSchema,
       value: z.any(),
       action: LogicActionSchema,
-      targetQuestionId: z.string().min(1),
+      targetTempId: z.string().min(1),
     })
   ),
 });

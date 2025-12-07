@@ -18,4 +18,8 @@ export class MongoSurveyRepository implements ISurveyRepository {
 
     return SurveyPersistenceMapper.toEntity(doc);
   }
+
+  async delete(id: string): Promise<void>{
+    await SurveyModel.deleteOne({ _id: id })
+  }
 }

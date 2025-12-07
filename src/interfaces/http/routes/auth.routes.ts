@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller.js";
 import { validateSchema } from "../middlewares/validate-schema.middleware.js";
-import { LoginSchema } from "../dtos/auth/login.schema.js";
-import { RegisterSchema } from "../dtos/auth/register.schema.js";
+import { LoginSchema } from "../schemas/auth/login.schema.js";
+import { RegisterSchema } from "../schemas/auth/register.schema.js";
 
 const createAuthRoutes = (authController: AuthController) => {
   const router = Router();

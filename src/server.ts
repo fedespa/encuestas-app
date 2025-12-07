@@ -3,6 +3,7 @@ import app from "./app.js";
 import createAuthRoutes from "./interfaces/http/routes/auth.routes.js";
 import {
   authController,
+  jwtTokenService,
   surveyController,
 } from "./infrastructure/config/container.js";
 import { errorHandler } from "./interfaces/http/middlewares/error-handler.middleware.js";
@@ -10,7 +11,7 @@ import createSurveyRoutes from "./interfaces/http/routes/survey.routes.js";
 
 // Montar rutas con dependencias ya inyectadas
 app.use("/auth", createAuthRoutes(authController));
-app.use("/survey", createSurveyRoutes(surveyController));
+app.use("/survey", createSurveyRoutes(surveyController, jwtTokenService));
 
 app.use(errorHandler);
 

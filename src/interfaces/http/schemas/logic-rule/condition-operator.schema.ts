@@ -5,5 +5,6 @@ export const ConditionOperatorSchema = z.enum([
   "not_equals",
   "greater_than",
   "less_than",
-  "contains",
+  "includes",
+  "not_includes",
 ]);

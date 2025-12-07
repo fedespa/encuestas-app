@@ -64,8 +64,8 @@ export class QuestionEntity {
     }
 
     switch (options.type) {
-      case "single-choice":
-      case "multiple-choice":
+      case "single_choice":
+      case "multiple_choice":
         if (!options.options || options.options.length === 0) {
           throw new Error(
             `Question of type '${type}' must define at least one option.`
