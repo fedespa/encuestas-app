@@ -1,5 +1,4 @@
 import { RefreshTokenEntity } from "../../../domain/refresh-token/refresh-token.entity.js";
-import type { IRefreshTokenRepository } from "../../../domain/refresh-token/refresh-token.repository.js";
 import { UserNotFoundError } from "../../../domain/user/user.errors.js";
 import type { IUserRepository } from "../../../domain/user/user.repository.js";
 import {
@@ -7,24 +6,24 @@ import {
   VerificationTokenNotFoundError,
 } from "../../../domain/verification-token/verification-token.errors.js";
 import type { IVerificationTokenRepository } from "../../../domain/verification-token/verification-token.repository.js";
-import type { LoginVm } from "../../../interfaces/http/view-models/auth/login.vm.js";
+import type { LoginVm } from "../../view-models/auth/login.vm.js";
 import { UserMapper } from "../../mappers/user/user.vm.mapper.js";
 import type { JwtService } from "../../services/jwt.service.js";
 import type { TokenService } from "../../services/token.service.js";
+import type { IUnitOfWork } from "../../services/unit-of-work.js";
 
 export class VerifyEmailUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly verificationTokenRepository: IVerificationTokenRepository,
     private readonly jwtService: JwtService,
-    private readonly refreshTokenRepository: IRefreshTokenRepository,
-    private readonly tokenService: TokenService
+    private readonly tokenService: TokenService,
+    private readonly unitOfWork: IUnitOfWork
   ) {}
 
   async execute(input: { token: string }): Promise<LoginVm> {
-    const verificationToken = await this.verificationTokenRepository.findByToken(
-      input.token
-    );
+    const verificationToken =
+      await this.verificationTokenRepository.findByToken(input.token);
 
     if (!verificationToken) {
       throw new VerificationTokenNotFoundError();
@@ -35,7 +34,7 @@ export class VerifyEmailUseCase {
       throw new VerificationTokenExpiredError();
     }
 
-    const user = await this.userRepository.findById(verificationToken.getUserId());
+    const user = await this.userRepository.findById(verificationToken.userId);
 
     if (!user) {
       throw new UserNotFoundError();
@@ -43,29 +42,30 @@ export class VerifyEmailUseCase {
 
     user.verifyEmail();
 
-    const updatedUser = await this.userRepository.update(user.getId(), user);
-
-    await this.verificationTokenRepository.deleteByToken(input.token);
-
     const accessToken = await this.jwtService.generateAccessToken({
-      userId: updatedUser.getId(),
+      userId: user.id,
     });
 
     const refreshToken = await this.jwtService.generateRefreshToken({
-      userId: updatedUser.getId(),
+      userId: user.id,
     });
 
-    this.refreshTokenRepository.create(RefreshTokenEntity.create({
+    const refreshTokenEntity = RefreshTokenEntity.create({
       id: this.tokenService.generateUUID(),
-      userId: updatedUser.getId(),
+      userId: user.id,
       token: refreshToken,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
-    }))
+    });
+
+    await this.unitOfWork.execute(async (unitOfWork) => {
+      unitOfWork.auth.userRepository.update(user.id, user);
+      unitOfWork.auth.verificationTokenRepository.deleteByToken(input.token);
+      unitOfWork.auth.refreshTokenRepository.create(refreshTokenEntity);
+    });
 
     return {
-      user: UserMapper.toVm(updatedUser),
+      user: UserMapper.toVm(user),
       accessToken,
-      refreshToken
+      refreshToken,
     };
   }
 }

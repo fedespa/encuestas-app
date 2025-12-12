@@ -15,13 +15,13 @@ export class QuestionPersistenceMapper {
 
   static toPersistence(entity: QuestionEntity) {
     return {
-      _id: entity.getId(),
-      surveyId: entity.getSurveyId(),
-      type: entity.getType(),
-      questionText: entity.getQuestionText(),
-      required: entity.getRequired(),
-      options: entity.getOptions(),
-      order: entity.getOrder(),
+      _id: entity.id,
+      surveyId: entity.surveyId,
+      type: entity.type,
+      questionText: entity.questionText,
+      required: entity.required,
+      options: entity.options,
+      order: entity.order,
   }
   }
 }

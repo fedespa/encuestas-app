@@ -15,13 +15,13 @@ export class SurveyPersistenceMapper {
 
   static toPersistence(entity: SurveyEntity) {
     return {
-      _id: entity.getId(),
-      title: entity.getTitle(),
-      description: entity.getDescription(),
-      isPublic: entity.getIsPublic(),
-      createdAt: entity.getCreatedAt(),
-      updatedAt: entity.getUpdatedAt(),
-      ownerId: entity.getOwnerId() ?? null,
+      _id: entity.id,
+      title: entity.title,
+      description: entity.description,
+      isPublic: entity.isPublic,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      ownerId: entity.ownerId ?? null,
     };
   }
 }

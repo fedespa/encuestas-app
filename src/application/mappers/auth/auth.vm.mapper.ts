@@ -1,5 +1,5 @@
 import type { UserEntity } from "../../../domain/user/user.entity.js";
-import type { RegisterVm } from "../../../interfaces/http/view-models/auth/register.vm.js";
+import type { RegisterVm } from "../../view-models/auth/register.vm.js";
 import { UserMapper } from "../user/user.vm.mapper.js";
 
 export class AuthVMMapper {

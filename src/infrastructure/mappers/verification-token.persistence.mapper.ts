@@ -13,11 +13,11 @@ export class VerificationTokenPersistenceMapper {
 
   static toPersistence(entity: VerificationTokenEntity){
     return {
-        _id: entity.getId(),
-        userId: entity.getUserId(),
-        token: entity.getToken(),
-        expiresAt: entity.getExpiresAt(),
-        createdAt: entity.getCreatedAt()
+        _id: entity.id,
+        userId: entity.userId,
+        token: entity.token,
+        expiresAt: entity.expiresAt,
+        createdAt: entity.createdAt
     }
   }
 }

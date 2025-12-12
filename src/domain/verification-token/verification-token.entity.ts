@@ -2,34 +2,18 @@ export interface VerificationTokenProps {
   id: string;
   userId: string;
   token: string;
-  expiresAt: Date;
+  expiresAt?: Date;
   createdAt?: Date;
 }
 
 export class VerificationTokenEntity {
   private constructor(
-    private readonly id: string,
-    private userId: string,
-    private token: string,
-    private expiresAt: Date,
-    private readonly createdAt: Date = new Date()
+    public readonly id: string,
+    public userId: string,
+    public token: string,
+    public expiresAt: Date,
+    public readonly createdAt: Date = new Date()
   ) {}
-
-  getId() {
-    return this.id;
-  }
-  getUserId() {
-    return this.userId;
-  }
-  getToken() {
-    return this.token;
-  }
-  getExpiresAt() {
-    return this.expiresAt;
-  }
-  getCreatedAt() {
-    return this.createdAt;
-  }
 
   isExpired(): boolean {
     return this.expiresAt <= new Date();
@@ -72,7 +56,7 @@ export class VerificationTokenEntity {
       props.id,
       props.userId,
       props.token,
-      props.expiresAt,
+      props.expiresAt ?? new Date(Date.now() + 1000 * 60 * 60 * 24),
       props.createdAt ?? new Date()
     );
   }

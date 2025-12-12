@@ -15,13 +15,13 @@ export class LogicRulePersistenceMapper {
 
   static toPersistence(entity: LogicRuleEntity) {
     return {
-      _id: entity.getId(),
-      surveyId: entity.getSurveyId(),
-      sourceQuestionId: entity.getSourceQuestionId(),
-      operator: entity.getOperator(),
-      value: entity.getValue(),
-      action: entity.getAction(),
-      targetQuestionId: entity.getTargetQuestionId(),
+      _id: entity.id,
+      surveyId: entity.surveyId,
+      sourceQuestionId: entity.sourceQuestionId,
+      operator: entity.operator,
+      value: entity.value,
+      action: entity.action,
+      targetQuestionId: entity.targetQuestionId,
     };
   }
 }

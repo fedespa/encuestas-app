@@ -1,3 +1,4 @@
+import type { ClientSession } from "mongoose";
 import { VerificationTokenEntity } from "../../../domain/verification-token/verification-token.entity.js";
 import type { IVerificationTokenRepository } from "../../../domain/verification-token/verification-token.repository.js";
 import { VerificationTokenModel } from "../../db/mongo/verification-token.model.js";
@@ -6,12 +7,22 @@ import { VerificationTokenPersistenceMapper } from "../../mappers/verification-t
 export class MongoVerificationTokenRepository
   implements IVerificationTokenRepository
 {
+  private session: ClientSession | null = null;
+
+  setSession(session: ClientSession) {
+    this.session = session;
+  }
+
+  clearSession() {
+    this.session = null;
+  }
+
   async create(
     verificationToken: VerificationTokenEntity
   ): Promise<VerificationTokenEntity> {
     const persistence =
       VerificationTokenPersistenceMapper.toPersistence(verificationToken);
-    await VerificationTokenModel.create(persistence);
+    await VerificationTokenModel.create([persistence], { session: this.session });
 
     return verificationToken;
   }
@@ -23,7 +34,8 @@ export class MongoVerificationTokenRepository
     return VerificationTokenPersistenceMapper.toEntity(doc);
   }
   async deleteByToken(token: string): Promise<void> {
-    await VerificationTokenModel.deleteOne({ token });
+    const options = this.session ? { session: this.session } : {};
+    await VerificationTokenModel.deleteOne({ token }, options);
   }
   async deleteAllByUserId(userId: string): Promise<void> {
     await VerificationTokenModel.deleteMany({ userId });

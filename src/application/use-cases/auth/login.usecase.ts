@@ -8,7 +8,7 @@ import {
 import type { IUserRepository } from "../../../domain/user/user.repository.js";
 import { VerificationTokenEntity } from "../../../domain/verification-token/verification-token.entity.js";
 import type { IVerificationTokenRepository } from "../../../domain/verification-token/verification-token.repository.js";
-import type { LoginVm } from "../../../interfaces/http/view-models/auth/login.vm.js";
+import type { LoginVm } from "../../view-models/auth/login.vm.js";
 import { UserMapper } from "../../mappers/user/user.vm.mapper.js";
 import type { HashService } from "../../services/hash.service.js";
 import type { JwtService } from "../../services/jwt.service.js";
@@ -33,23 +33,21 @@ export class LoginUseCase {
       throw new UserNotFoundError();
     }
 
-    const isValid = await this.hashService.compare(password, user.getPassword());
+    const isValid = await this.hashService.compare(password, user.password);
 
     if (!isValid) {
       throw new InvalidCredentialsError();
     }
 
-    if (!user.getIsVerified()) {
-      await this.verificationTokenRepository.deleteAllByUserId(user.getId());
+    if (!user.isVerified) {
+      await this.verificationTokenRepository.deleteAllByUserId(user.id);
 
       const token = await this.tokenService.generate();
 
       const verificationToken = VerificationTokenEntity.create({
         id: this.tokenService.generateUUID(),
-        userId: user.getId(),
+        userId: user.id,
         token: token,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
-        createdAt: new Date(),
       });
 
       await this.verificationTokenRepository.create(verificationToken);
@@ -60,19 +58,18 @@ export class LoginUseCase {
     }
 
     const accessToken = await this.jwtService.generateAccessToken({
-      userId: user.getId(),
+      userId: user.id,
     });
 
     const refreshToken = await this.jwtService.generateRefreshToken({
-      userId: user.getId(),
+      userId: user.id,
     });
 
     await this.refreshTokenRepository.create(
       RefreshTokenEntity.create({
         id: this.tokenService.generateUUID(),
-        userId: user.getId(),
+        userId: user.id,
         token: refreshToken,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
       })
     );
 

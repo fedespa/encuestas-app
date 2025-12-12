@@ -1,3 +1,8 @@
+import "dotenv/config";
+import { validateEnv } from "./infrastructure/config/env.js";
+
+validateEnv()
+
 import mongoose from "mongoose";
 import app from "./app.js";
 import createAuthRoutes from "./interfaces/http/routes/auth.routes.js";
@@ -8,8 +13,18 @@ import {
 } from "./infrastructure/config/container.js";
 import { errorHandler } from "./interfaces/http/middlewares/error-handler.middleware.js";
 import createSurveyRoutes from "./interfaces/http/routes/survey.routes.js";
+import rateLimit from "express-rate-limit";
 
-// Montar rutas con dependencias ya inyectadas
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 80,
+  standardHeaders: true, 
+  legacyHeaders: false,
+});
+
+app.use(generalLimiter);
+
 app.use("/auth", createAuthRoutes(authController));
 app.use("/survey", createSurveyRoutes(surveyController, jwtTokenService));
 
@@ -22,13 +37,7 @@ const MONGO_URI =
 
 (async () => {
   try {
-    mongoose.set("debug", (collectionName, method, query, doc) => {
-      console.log(
-        `[Mongoose] ${collectionName}.${method}`,
-        JSON.stringify(query),
-        doc ? JSON.stringify(doc) : ""
-      );
-    });
+    mongoose.set("debug", true);
 
     await mongoose.connect(MONGO_URI);
     console.log("🔌 Conectado a MongoDB");

@@ -12,42 +12,14 @@ export interface LogicRuleProps {
 
 export class LogicRuleEntity {
   private constructor(
-    private readonly id: string,
-    private surveyId: string,
-    private sourceQuestionId: string,
-    private operator: ConditionOperator,
-    private value: any,
-    private action: LogicAction,
-    private targetQuestionId: string
+    public readonly id: string,
+    public readonly surveyId: string,
+    public readonly sourceQuestionId: string,
+    public operator: ConditionOperator,
+    public value: any,
+    public action: LogicAction,
+    public targetQuestionId: string
   ) {}
-
-  getId() {
-    return this.id;
-  }
-
-  getSurveyId() {
-    return this.surveyId;
-  }
-
-  getSourceQuestionId() {
-    return this.sourceQuestionId;
-  }
-
-  getOperator() {
-    return this.operator;
-  }
-
-  getValue() {
-    return this.value;
-  }
-
-  getAction() {
-    return this.action;
-  }
-
-  getTargetQuestionId() {
-    return this.targetQuestionId;
-  }
 
   private static validate(props: LogicRuleProps) {
     if (!props.id) {

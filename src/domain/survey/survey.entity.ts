@@ -10,36 +10,14 @@ export interface SurveyProps {
 
 export class SurveyEntity {
   private constructor(
-    private readonly id: string,
-    private title: string,
-    private description: string,
-    private isPublic: boolean,
-    private readonly createdAt: Date,
-    private updatedAt: Date,
-    private ownerId?: string | undefined
+    public readonly id: string,
+    public title: string,
+    public description: string,
+    public isPublic: boolean,
+    public readonly createdAt: Date,
+    public updatedAt: Date,
+    public ownerId?: string | undefined
   ) {}
-
-  getId() {
-    return this.id;
-  }
-  getTitle() {
-    return this.title;
-  }
-  getDescription() {
-    return this.description;
-  }
-  getIsPublic() {
-    return this.isPublic;
-  }
-  getCreatedAt() {
-    return this.createdAt;
-  }
-  getUpdatedAt() {
-    return this.updatedAt;
-  }
-  getOwnerId() {
-    return this.ownerId;
-  }
 
   changeTitle(newTitle: string) {
     if (!newTitle || newTitle.length === 0) {
@@ -67,26 +45,26 @@ export class SurveyEntity {
   }
 
   private static validate(props: SurveyProps) {
-    if (!props.id) throw new Error("Survey must have an ID.");
+    if (!props.id) throw new Error("Tiene que tener un id.");
 
     if (!props.title || props.title.trim().length === 0) {
-      throw new Error("Survey title cannot be empty.");
+      throw new Error("El titulo no puede estar vacio.");
     }
 
     if (!props.description || props.description.trim().length === 0) {
-      throw new Error("Survey description cannot be empty.");
+      throw new Error("La descripcion no puiede estar vacia.");
     }
 
     if (!(props.createdAt instanceof Date)) {
-      throw new Error("createdAt must be a Date instance.");
+      throw new Error("createdAt debe ser del formato Date.");
     }
 
     if (!(props.updatedAt instanceof Date)) {
-      throw new Error("updatedAt must be a Date instance.");
+      throw new Error("updatedAt debe ser del formato Date.");
     }
 
     if (props.updatedAt < props.createdAt) {
-      throw new Error("updatedAt cannot be earlier than createdAt.");
+      throw new Error("updatedAt no puede ser antes que createdAt.");
     }
   }
 

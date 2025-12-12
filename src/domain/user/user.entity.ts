@@ -8,28 +8,12 @@ export interface UserProps {
 
 export class UserEntity {
   private constructor(
-    private readonly id: string,
-    private email: string,
-    private password: string,
-    private isVerified: boolean,
-    private readonly createdAt: Date
+    public readonly id: string,
+    public email: string,
+    public password: string,
+    public isVerified: boolean,
+    public readonly createdAt: Date
   ) {}
-
-  getId() {
-    return this.id;
-  }
-  getEmail() {
-    return this.email;
-  }
-  getPassword() {
-    return this.password;
-  }
-  getIsVerified() {
-    return this.isVerified;
-  }
-  getCreatedAt() {
-    return this.createdAt;
-  }
 
   verifyEmail() {
     this.isVerified = true;

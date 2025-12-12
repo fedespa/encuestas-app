@@ -9,3 +9,30 @@ export class PrivateSurveyRequiresLoginError extends AppError {
     this.name = "PrivateSurveyRequiresLoginError";
   }
 }
+
+export class SurveyNotFoundError extends AppError {
+  constructor() {
+    super(
+      "La encuesta solicitada no existe.",
+      404
+    );
+    this.name = "SurveyNotFoundError";
+  }
+}
+
+export class SurveyCreationError extends AppError {
+  constructor (message: string){
+    super(
+      `Error en la creación de la encuesta: ${message}`,
+      400
+    )
+    this.name = "SurveyCreationError"
+  }
+}
+
+export class SurveyResponseError extends AppError {
+  constructor(message: string) {
+    super(`Error en la respuesta de la encuesta: ${message}`);
+    this.name = "SurveyResponseError";
+  }
+}

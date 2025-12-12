@@ -1,23 +1,36 @@
+import type { ClientSession } from "mongoose";
 import { UserEntity } from "../../../domain/user/user.entity.js";
 import type { IUserRepository } from "../../../domain/user/user.repository.js";
 import { UserModel } from "../../db/mongo/user.model.js";
 import { UserPersistenceMapper } from "../../mappers/user.persistence.mapper.js";
 
 export class MongoUserRepository implements IUserRepository {
+  private session: ClientSession | null = null;
+
+  setSession(session: ClientSession) {
+    this.session = session;
+  }
+
+  clearSession() {
+    this.session = null;
+  }
+
   async delete(id: string): Promise<void> {
-    await UserModel.deleteOne({ _id: id })
+    await UserModel.deleteOne({ _id: id });
   }
 
   async update(id: string, data: UserEntity): Promise<UserEntity> {
     const persistence = UserPersistenceMapper.toPersistence(data);
 
-    await UserModel.updateOne({ _id: id }, persistence);
+    const options = this.session ? { session: this.session } : {};
+
+    await UserModel.updateOne({ _id: id }, persistence, options);
     return data;
   }
 
   async create(user: UserEntity): Promise<UserEntity> {
     const persistence = UserPersistenceMapper.toPersistence(user);
-    await UserModel.create(persistence);
+    await UserModel.create([persistence], { session: this.session });
 
     return user;
   }
@@ -35,5 +48,4 @@ export class MongoUserRepository implements IUserRepository {
 
     return UserPersistenceMapper.toEntity(doc);
   }
-  
 }

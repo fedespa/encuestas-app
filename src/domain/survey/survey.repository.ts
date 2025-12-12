@@ -4,6 +4,7 @@ export interface ISurveyRepository {
 
     create(survey: SurveyEntity): Promise<SurveyEntity>;
     findByOwnerId(ownerId: string) : Promise<SurveyEntity | null>;
+    findById(id: string) : Promise<SurveyEntity | null>;
     delete(id: string): Promise<void>;
 
 }

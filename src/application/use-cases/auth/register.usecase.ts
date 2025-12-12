@@ -2,18 +2,18 @@ import { UserEntity } from "../../../domain/user/user.entity.js";
 import { EmailAlreadyExistsError } from "../../../domain/user/user.errors.js";
 import type { IUserRepository } from "../../../domain/user/user.repository.js";
 import { VerificationTokenEntity } from "../../../domain/verification-token/verification-token.entity.js";
-import type { IVerificationTokenRepository } from "../../../domain/verification-token/verification-token.repository.js";
-import type { RegisterVm } from "../../../interfaces/http/view-models/auth/register.vm.js";
+import type { RegisterVm } from "../../view-models/auth/register.vm.js";
 import { UserMapper } from "../../mappers/user/user.vm.mapper.js";
 import type { HashService } from "../../services/hash.service.js";
 import type { TokenService } from "../../services/token.service.js";
+import type { IUnitOfWork } from "../../services/unit-of-work.js";
 
 export class RegisterUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly hashService: HashService,
     private readonly tokenService: TokenService,
-    private readonly verificationTokenRepository: IVerificationTokenRepository
+    private readonly unitOfWork: IUnitOfWork
   ) {}
 
   async execute(input: {
@@ -35,28 +35,22 @@ export class RegisterUseCase {
       isVerified: false,
     });
 
-    const newUser = await this.userRepository.create(user);
-
     const newToken = await this.tokenService.generate();
 
     const verificationToken = VerificationTokenEntity.create({
       id: this.tokenService.generateUUID(),
-      userId: user.getId(),
+      userId: user.id,
       token: newToken,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      createdAt: new Date(),
     });
 
-    try {
-      await this.verificationTokenRepository.create(verificationToken);
-    } catch (error) {
-      await this.userRepository.delete(newUser.getId())
-      throw error
-    }
+    await this.unitOfWork.execute(async (unitOfWork) => {
+      await unitOfWork.auth.userRepository.create(user),
+      await unitOfWork.auth.verificationTokenRepository.create(verificationToken)
+    })
 
     return {
-      user: UserMapper.toVm(newUser),
-      verificationUrl: `http://localhost:3000/auth/verify?token=${newToken}`,
+      user: UserMapper.toVm(user),
+      verificationToken: newToken,
     };
   }
 }

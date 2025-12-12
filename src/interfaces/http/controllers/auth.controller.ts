@@ -20,7 +20,11 @@ export class AuthController {
       password,
     });
 
-    return res.status(201).json(registerResponse);
+    const { user, verificationToken } = registerResponse;
+
+    const verificationUrl = `http://localhost:3000/auth/verify?token=${verificationToken}`;
+
+    return res.status(201).json({ user, verificationUrl });
   }
 
   public async verify(req: Request, res: Response) {
@@ -36,10 +40,16 @@ export class AuthController {
 
     const { user, accessToken, refreshToken } = result;
 
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      path: "/auth/refresh",
+    });
+
     return res.status(200).json({
       user,
       accessToken,
-      refreshToken, // BORRAR DE ACA
     });
   }
 
@@ -53,10 +63,16 @@ export class AuthController {
 
     const { user, accessToken, refreshToken } = loginResponse;
 
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      path: "/auth/refresh",
+    });
+
     return res.status(200).json({
       user,
       accessToken,
-      refreshToken, // BORRAR DE ACA
     });
   }
 }

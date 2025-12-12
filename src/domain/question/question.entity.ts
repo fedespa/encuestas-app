@@ -12,36 +12,14 @@ export interface QuestionProps {
 
 export class QuestionEntity {
   private constructor(
-    private readonly id: string,
-    private surveyId: string,
-    private type: QuestionType,
-    private questionText: string,
-    private required: boolean,
-    private options: QuestionOptions,
-    private order: number
+    public readonly id: string,
+    public readonly surveyId: string,
+    public type: QuestionType,
+    public questionText: string,
+    public required: boolean,
+    public options: QuestionOptions,
+    public order: number
   ) {}
-
-  getId() {
-    return this.id;
-  }
-  getSurveyId() {
-    return this.surveyId;
-  }
-  getType() {
-    return this.type;
-  }
-  getQuestionText() {
-    return this.questionText;
-  }
-  getRequired() {
-    return this.required;
-  }
-  getOptions() {
-    return this.options;
-  }
-  getOrder() {
-    return this.order;
-  }
 
   private static validate(props: QuestionProps) {
     const { type, options } = props;

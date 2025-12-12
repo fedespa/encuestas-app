@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     // Paths
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist",
 
     // Environment
@@ -11,7 +11,7 @@
 
     // Node types
     "lib": ["esnext"],
-    "types": ["node"],
+    "types": ["jest", "node"],
 
     // Output
     "sourceMap": true,
@@ -32,5 +32,5 @@
     // Misc
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": ["src", "tests"]
 }

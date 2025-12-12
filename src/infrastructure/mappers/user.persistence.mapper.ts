@@ -13,11 +13,11 @@ export class UserPersistenceMapper {
 
   static toPersistence(entity: UserEntity) {
     return {
-      _id: entity.getId(),
-      email: entity.getEmail(),
-      password: entity.getPassword(),
-      isVerified: entity.getIsVerified(),
-      createdAt: entity.getCreatedAt(),
+      _id: entity.id,
+      email: entity.email,
+      password: entity.password,
+      isVerified: entity.isVerified,
+      createdAt: entity.createdAt,
     };
   }
 }

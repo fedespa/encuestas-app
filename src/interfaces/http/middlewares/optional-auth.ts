@@ -5,8 +5,6 @@ export const optionalAuth = (jwtService: JwtService) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
-    console.log("AUTH HEADER", authHeader)
-
     if (!authHeader) {
       req.user = null;
       return next();
