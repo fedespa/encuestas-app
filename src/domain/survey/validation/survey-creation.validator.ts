@@ -131,6 +131,11 @@ export class SurveyCreationValidator {
     questions: QuestionEntity[],
     logicRules: LogicRuleEntity[]
   ): LogicRuleEntity[] {
+    if (questions.length < 1)
+      throw new SurveyCreationError(
+        "La encuesta debe tener al menos una pregunta. "
+      );
+
     // 1️⃣ Validar orden de preguntas
     this.validateSurveyOrdering(questions);
 

@@ -1,13 +1,36 @@
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend_dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+    command: npm run dev
   mongo:
     image: mongo:7
     container_name: mongo
     restart: always
-    command: ["bash", "-c", "mongod --replSet rs0 --bind_ip_all && sleep 5 && mongosh --eval 'rs.initiate()'"]
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+  rs-init:
+    image: mongo:7 
+    container_name: rs-init
+    volumes:
+      - ./rs-init.sh:/rs-init.sh # Monta el script
+    command: /rs-init.sh # Ejecuta el script
+    depends_on:
+      - mongo
 
 volumes:
   mongo_data:

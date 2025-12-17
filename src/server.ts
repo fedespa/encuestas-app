@@ -9,12 +9,19 @@ import createAuthRoutes from "./interfaces/http/routes/auth.routes.js";
 import {
   authController,
   jwtTokenService,
+  logger,
   surveyController,
 } from "./infrastructure/config/container.js";
 import { errorHandler } from "./interfaces/http/middlewares/error-handler.middleware.js";
 import createSurveyRoutes from "./interfaces/http/routes/survey.routes.js";
 import rateLimit from "express-rate-limit";
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  limit: 10, 
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -23,12 +30,13 @@ const generalLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+app.use("/auth", authLimiter, createAuthRoutes(authController));
+
 app.use(generalLimiter);
 
-app.use("/auth", createAuthRoutes(authController));
 app.use("/survey", createSurveyRoutes(surveyController, jwtTokenService));
 
-app.use(errorHandler);
+app.use(errorHandler(logger));
 
 const PORT = process.env.PORT ?? 3000;
 const MONGO_URI =

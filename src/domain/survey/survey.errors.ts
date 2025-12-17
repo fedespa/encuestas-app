@@ -36,3 +36,13 @@ export class SurveyResponseError extends AppError {
     this.name = "SurveyResponseError";
   }
 }
+
+export class SurveyWithoutQuestions extends AppError {
+  constructor() {
+    super(
+      `La encuesta no tiene preguntas. `,
+      500
+    );
+    this.name = "SurveyWithoutQuestions";
+  }
+}

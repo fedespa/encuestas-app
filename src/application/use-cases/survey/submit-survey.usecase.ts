@@ -12,9 +12,12 @@ import {
   SessionUserMismatchError,
 } from "../../../domain/response-session/response-session-errors.js";
 import type { IResponseSessionRepository } from "../../../domain/response-session/response-session.repository.js";
-import { SurveyStatsNotFoundError } from "../../../domain/survey-stats/survey-stats.error.js";
+import { SurveyStatsNotFoundError } from "../../../domain/survey-stats/survey-stats.errors.js";
 import type { ISurveyStatsRepository } from "../../../domain/survey-stats/survey-stats.repository.js";
+import { SurveyNotFoundError } from "../../../domain/survey/survey.errors.js";
+import type { ISurveyRepository } from "../../../domain/survey/survey.repository.js";
 import { SurveyResponseValidator } from "../../../domain/survey/validation/survey-response.validator.js";
+import type { ILoggerService } from "../../services/logger.service.js";
 import type { TokenService } from "../../services/token.service.js";
 import type { IUnitOfWork } from "../../services/unit-of-work.js";
 
@@ -37,18 +40,38 @@ export class SubmitSurveyUseCase {
     private readonly tokenService: TokenService,
     private readonly surveyStatsRepository: ISurveyStatsRepository,
     private readonly questionStatsRepository: IQuestionStatsRepository,
-    private readonly unitOfWork: IUnitOfWork
+    private readonly unitOfWork: IUnitOfWork,
+    private readonly surveyRepository: ISurveyRepository,
+    private readonly logger: ILoggerService
   ) {}
 
   async execute({ sessionId, answers, user }: SubmitSurveyInput) {
+    this.logger.info("Inicio de submit de encuesta", {
+      sessionId,
+      userId: user?.userId,
+      answersCount: answers.length,
+    });
+
     const session = await this.responseSessionRepository.findById(sessionId);
 
     if (!session) {
+      this.logger.warn("Submit fallido: sesión no encontrada", { sessionId });
       throw new ResponseSessionNotFoundError();
     }
 
     if (session.isFinished()) {
+      this.logger.warn("Submit fallido: sesión ya finalizada", { sessionId });
       throw new SessionAlreadyFinishedError();
+    }
+
+    const survey = await this.surveyRepository.findById(session.surveyId);
+
+    if (!survey) {
+      this.logger.warn("Submit fallido: encuesta no encontrada", {
+        surveyId: session.surveyId,
+        sessionId,
+      });
+      throw new SurveyNotFoundError();
     }
 
     if (user) {
@@ -87,7 +110,7 @@ export class SubmitSurveyUseCase {
       throw new SessionAlreadyFinishedError();
     }
 
-    const answeredQuestionIds = answers.map(a => a.questionId);
+    const answeredQuestionIds = answers.map((a) => a.questionId);
 
     const [surveyStats, questionsStats] = await Promise.all([
       await this.surveyStatsRepository.findBySurveyId(session.surveyId),
@@ -103,9 +126,9 @@ export class SubmitSurveyUseCase {
     if (questionsStats.length !== answers.length) {
       throw new QuestionStatsCountMismatchError();
     }
- 
+
     for (const stat of questionsStats) {
-      const answer = answers.find(a => a.questionId === stat.questionId);
+      const answer = answers.find((a) => a.questionId === stat.questionId);
 
       if (!answer) {
         throw new AnswerNotFoundForQuestionError();
@@ -116,9 +139,22 @@ export class SubmitSurveyUseCase {
 
     await this.unitOfWork.execute(async (unitOfWork) => {
       await unitOfWork.survey.surveyStatsRepository.update(surveyStats);
-      await unitOfWork.survey.questionStatsRepository.updateMany(questionsStats);
+      await unitOfWork.survey.questionStatsRepository.updateMany(
+        questionsStats
+      );
       await unitOfWork.survey.answerRepository.createMany(answersEntities);
-      await unitOfWork.survey.responseSessionRepository.update(session.id, session);
+      await unitOfWork.survey.responseSessionRepository.update(
+        session.id,
+        session
+      );
+    });
+
+    this.logger.info("Encuesta completada correctamente", {
+      sessionId,
+      surveyId: session.surveyId,
+      userId: session.userId,
+      completionTimeSeconds: time,
+      answersCount: answers.length,
     });
   }
 }

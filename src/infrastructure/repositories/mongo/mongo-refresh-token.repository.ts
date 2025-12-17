@@ -32,4 +32,11 @@ export class MongoRefreshTokenRepository implements IRefreshTokenRepository {
   async deleteByToken(token: string): Promise<void> {
     throw new Error("Method not implemented.");
   }
+  async findById(id: string): Promise<RefreshTokenEntity | null>{
+    const doc = await RefreshTokenModel.findOne({ _id: id })
+
+    if (!doc) return null;
+
+    return RefreshTokenPersistenceMapper.toEntity(doc);
+  }
 }

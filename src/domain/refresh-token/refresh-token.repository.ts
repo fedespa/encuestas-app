@@ -5,5 +5,6 @@ export interface IRefreshTokenRepository {
     create(refreshToken: RefreshTokenEntity): Promise<RefreshTokenEntity>
     findByToken(token: string): Promise<RefreshTokenEntity | null>;
     deleteByToken(token: string): Promise<void>;
+    findById(id: string): Promise<RefreshTokenEntity | null>;
 
 }

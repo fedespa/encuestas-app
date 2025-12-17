@@ -5,12 +5,15 @@ import { CreateSurveySchema } from "../schemas/survey/create-survey.schema.js";
 import type { JwtService } from "../../../application/services/jwt.service.js";
 import { optionalAuth } from "../middlewares/optional-auth.js";
 import { SubmitResponseSessionSchema } from "../schemas/response-session/submit-response-session.schema.js";
+import { AbandonSurveySchema } from "../schemas/survey/abandon-survey.schema.js";
 
 const createSurveyRoutes = (
   surveyController: SurveyController,
   jwtService: JwtService
 ) => {
   const router = Router();
+
+  router.get("/:id", (req, res) => surveyController.getById(req, res));
 
   router.post(
     "/",
@@ -30,8 +33,15 @@ const createSurveyRoutes = (
     (req, res) => surveyController.submit(req, res)
   );
 
-  router.post("/:id/abandon", optionalAuth(jwtService), (req, res) =>
-    surveyController.abandon(req, res)
+  router.post(
+    "/:id/abandon",
+    optionalAuth(jwtService),
+    validateSchema(AbandonSurveySchema),
+    (req, res) => surveyController.abandon(req, res)
+  );
+
+  router.get("/:id/stats", optionalAuth(jwtService), (req, res) =>
+    surveyController.getStats(req, res)
   );
 
   return router;

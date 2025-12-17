@@ -42,16 +42,19 @@ export class VerifyEmailUseCase {
 
     user.verifyEmail();
 
+    const refreshTokenId = this.tokenService.generateUUID();
+
     const accessToken = await this.jwtService.generateAccessToken({
       userId: user.id,
     });
 
     const refreshToken = await this.jwtService.generateRefreshToken({
       userId: user.id,
+      jti: refreshTokenId
     });
 
     const refreshTokenEntity = RefreshTokenEntity.create({
-      id: this.tokenService.generateUUID(),
+      id: refreshTokenId,
       userId: user.id,
       token: refreshToken,
     });

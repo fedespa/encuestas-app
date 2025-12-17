@@ -9,3 +9,15 @@ export class SurveyStatsNotFoundError extends AppError {
         this.name = "SurveyStatsNotFoundError"
     }
 }
+
+export class InconsistentSurveyStatsError extends AppError {
+  constructor() {
+    super(`Estadisticas de la encuesta son inconsistente. `);
+  }
+}
+
+export class PrivateSurveyStatsError extends AppError {
+  constructor() {
+    super(`Las estadísticas de la encuesta son privadas. `);
+  }
+}

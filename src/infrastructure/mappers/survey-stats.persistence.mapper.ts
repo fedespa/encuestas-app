@@ -6,7 +6,10 @@ export class SurveyStatsPersistenceMapper {
       id: doc._id,
       surveyId: doc.surveyId,
       avgCompletionTime: doc.avgCompletionTime,
-      minCompletionTime: doc.minCompletionTime,
+      minCompletionTime:
+        doc.minCompletionTime === 0
+          ? Number.POSITIVE_INFINITY
+          : doc.minCompletionTime,
       maxCompletionTime: doc.maxCompletionTime,
       abandonmentRate: doc.abandonmentRate,
       totalResponses: doc.totalResponses,
@@ -19,7 +22,8 @@ export class SurveyStatsPersistenceMapper {
       _id: entity.id,
       surveyId: entity.surveyId,
       avgCompletionTime: entity.avgCompletionTime,
-      minCompletionTime: entity.minCompletionTime,
+      minCompletionTime:
+        entity.minCompletionTime === Infinity ? 0 : entity.minCompletionTime,
       maxCompletionTime: entity.maxCompletionTime,
       abandonmentRate: entity.abandonmentRate,
       totalResponses: entity.totalResponses,

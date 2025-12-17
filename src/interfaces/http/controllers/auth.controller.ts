@@ -3,6 +3,7 @@ import type { RegisterUseCase } from "../../../application/use-cases/auth/regist
 import type { VerifyEmailUseCase } from "../../../application/use-cases/auth/verify-email.usecase.js";
 import { VerificationTokenNotProvidedError } from "../../../domain/verification-token/verification-token.errors.js";
 import type { LoginUseCase } from "../../../application/use-cases/auth/login.usecase.js";
+import type { RefreshTokenUseCase } from "../../../application/use-cases/auth/refresh-token.usecase.js";
 
 export class AuthController {
   constructor(
@@ -10,6 +11,7 @@ export class AuthController {
       registerUseCase: RegisterUseCase;
       verifyEmailUseCase: VerifyEmailUseCase;
       loginUseCase: LoginUseCase;
+      refreshTokenUseCase: RefreshTokenUseCase;
     }
   ) {}
 
@@ -20,11 +22,18 @@ export class AuthController {
       password,
     });
 
-    const { user, verificationToken } = registerResponse;
+    const { verificationToken } = registerResponse;
 
+    // En demo: construyo la URL para mostrar al usuario
     const verificationUrl = `http://localhost:3000/auth/verify?token=${verificationToken}`;
 
-    return res.status(201).json({ user, verificationUrl });
+    /**
+     * 🔹 Nota de producción:
+     * En producción, la URL de verificación se enviaría por email y NO se incluiría
+     * en el JSON de la respuesta HTTP.
+     * El endpoint devuelve solo un mensaje de éxito.
+     */
+    return res.status(201).json({ message: "Se registró correctamente. Verifica tu email.", verificationUrl });
   }
 
   public async verify(req: Request, res: Response) {
@@ -74,5 +83,17 @@ export class AuthController {
       user,
       accessToken,
     });
+  }
+
+  public async refresh(req: Request, res: Response) {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({ error: "Token no enviado. " });
+    }
+
+    const response = await this.deps.refreshTokenUseCase.execute(refreshToken);
+
+    return res.json(response);
   }
 }

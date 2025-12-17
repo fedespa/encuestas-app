@@ -1,0 +1,7 @@
+{
+  "legacyWatch": true,
+  "ext": "ts,js,json",
+  "execMap": {
+    "ts": "tsx"
+  }
+}

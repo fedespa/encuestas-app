@@ -13,10 +13,10 @@ export class SurveyStatsEntity {
   private constructor(
     public readonly id: string,
     public readonly surveyId: string,
-    public avgCompletionTime: number, 
+    public avgCompletionTime: number,
     public minCompletionTime: number,
     public maxCompletionTime: number,
-    public abandonmentRate: number, 
+    public abandonmentRate: number,
     public totalResponses: number,
     public totalAbandoned: number
   ) {}
@@ -25,25 +25,35 @@ export class SurveyStatsEntity {
     this.minCompletionTime = Math.min(this.minCompletionTime, seconds);
     this.maxCompletionTime = Math.max(this.maxCompletionTime, seconds);
 
-    // Calcular nuevo promedio
     this.avgCompletionTime =
       (this.avgCompletionTime * this.totalResponses + seconds) /
       (this.totalResponses + 1);
 
     this.totalResponses++;
+    this.calculateAbandonmentRate();
+  }
+
+  private calculateAbandonmentRate() {
+    const totalStarted = this.totalResponses + this.totalAbandoned;
+
+    if (totalStarted === 0) {
+      this.abandonmentRate = 0;
+      return;
+    }
+
+    this.abandonmentRate = (this.totalAbandoned / totalStarted) * 100;
   }
 
   public registerAbandonment() {
     this.totalAbandoned++;
-    this.abandonmentRate =
-      (this.totalAbandoned / (this.totalResponses + this.totalAbandoned)) * 100;
+    this.calculateAbandonmentRate();
   }
 
   static create({
     id,
     surveyId,
     avgCompletionTime = 0,
-    minCompletionTime = 0,
+    minCompletionTime = Number.POSITIVE_INFINITY,
     maxCompletionTime = 0,
     abandonmentRate = 0,
     totalResponses = 0,
@@ -61,4 +71,3 @@ export class SurveyStatsEntity {
     );
   }
 }
-

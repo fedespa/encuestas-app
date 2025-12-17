@@ -1,7 +1,7 @@
 export interface QuestionStatsProps {
   id: string;
   questionId: string;
-  optionCounts?: Record<string, number>;
+  optionCounts?: Map<string, number>;
   abandonCount?: number;
   answerCount?: number;
 }
@@ -10,7 +10,7 @@ export class QuestionStatsEntity {
   private constructor(
     public readonly id: string,
     public readonly questionId: string,
-    public optionCounts: Record<string, number>, 
+    public optionCounts: Map<string, number>,
     public abandonCount: number = 0,
     public answerCount: number = 0
   ) {}
@@ -25,7 +25,8 @@ export class QuestionStatsEntity {
   }
 
   private incrementOption(option: string) {
-    this.optionCounts[option] = (this.optionCounts[option] || 0) + 1;
+    const current = this.optionCounts.get(option) ?? 0;
+    this.optionCounts.set(option, current + 1);
   }
 
   public registerAbandonment() {
@@ -35,7 +36,7 @@ export class QuestionStatsEntity {
   static create({
     id,
     questionId,
-    optionCounts = {},
+    optionCounts = new Map(),
     abandonCount = 0,
     answerCount = 0,
   }: QuestionStatsProps) {
@@ -45,8 +46,6 @@ export class QuestionStatsEntity {
       optionCounts,
       abandonCount,
       answerCount
-    )
+    );
   }
 }
-
-

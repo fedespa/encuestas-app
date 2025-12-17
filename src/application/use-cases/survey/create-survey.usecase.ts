@@ -17,6 +17,7 @@ import {
 } from "../../../domain/survey/survey.errors.js";
 import { SurveyCreationValidator } from "../../../domain/survey/validation/survey-creation.validator.js";
 import { SurveyVmMapper } from "../../mappers/survey/survey.vm.mapper.js";
+import type { ILoggerService } from "../../services/logger.service.js";
 import type { TokenService } from "../../services/token.service.js";
 import type { IUnitOfWork } from "../../services/unit-of-work.js";
 import type { CreatedSurveyVm } from "../../view-models/survey/created-survey.vm.js";
@@ -50,13 +51,20 @@ export interface CreateSurveyInputDTO {
 export class CreateSurveyUseCase {
   constructor(
     private readonly tokenService: TokenService,
-    private readonly unitOfWork: IUnitOfWork
+    private readonly unitOfWork: IUnitOfWork,
+    private readonly logger: ILoggerService
   ) {}
 
   async execute(input: CreateSurveyInputDTO): Promise<CreatedSurveyVm> {
     const { user } = input;
 
+    this.logger.info("Creación de encuesta iniciada", {
+      isPublic: input.survey.isPublic,
+      userId: user?.userId,
+    });
+
     if (!user && !input.survey.isPublic) {
+      this.logger.warn("Intento de crear encuesta privada sin autenticación");
       throw new PrivateSurveyRequiresLoginError();
     }
 
@@ -64,6 +72,7 @@ export class CreateSurveyUseCase {
     this.assertRulesReferenceExistingTempIds(input.questions, input.logicRules);
 
     if (input.questions.length < 2 && input.logicRules.length > 0) {
+      this.logger.warn("Reglas definidas con menos de dos preguntas");
       throw new SurveyCreationError(
         "No se pueden definir reglas con menos de dos preguntas."
       );
@@ -133,6 +142,13 @@ export class CreateSurveyUseCase {
       await unitOfWork.survey.questionStatsRepository.createMany(
         questionsStats
       );
+    });
+
+    this.logger.info("Encuesta creada correctamente", {
+      surveyId: survey.id,
+      ownerId: survey.ownerId,
+      questionsCount: questions.length,
+      rulesCount: orderedRules.length,
     });
 
     return {

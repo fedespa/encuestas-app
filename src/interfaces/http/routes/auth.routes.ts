@@ -17,6 +17,8 @@ const createAuthRoutes = (authController: AuthController) => {
     authController.login(req, res)
   );
 
+  router.post("/refresh", (req, res) => authController.refresh(req, res));
+
   return router;
 };
 

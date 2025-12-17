@@ -35,13 +35,15 @@ export class MongoQuestionStatsRepository implements IQuestionStatsRepository {
     if (questionIds.length === 0) return [];
 
     const docs = await QuestionStatsModel.find({
-      questionIds: { $in: questionIds },
+      questionId: { $in: questionIds },
     });
 
     return docs.map((doc) => QuestionStatsPersistenceMapper.toEntity(doc));
   }
 
   async updateMany(stats: QuestionStatsEntity[]): Promise<void> {
+    console.log(stats)
+
     const operations = stats.map((s) => ({
       updateOne: {
         filter: { _id: s.id },

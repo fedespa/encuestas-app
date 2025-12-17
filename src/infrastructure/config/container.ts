@@ -1,9 +1,12 @@
 import { LoginUseCase } from "../../application/use-cases/auth/login.usecase.js";
+import { RefreshTokenUseCase } from "../../application/use-cases/auth/refresh-token.usecase.js";
 import { RegisterUseCase } from "../../application/use-cases/auth/register.usecase.js";
 import { VerifyEmailUseCase } from "../../application/use-cases/auth/verify-email.usecase.js";
 import { StartResponseSessionUseCase } from "../../application/use-cases/response-session/start-response-session.usecase.js";
+import { GetSurveyStatsByIdUseCase } from "../../application/use-cases/survey-stats/get-survey-stats-by-id.usecase.js";
 import { AbandonSurveyUseCase } from "../../application/use-cases/survey/abandon-survey.usecase.js";
 import { CreateSurveyUseCase } from "../../application/use-cases/survey/create-survey.usecase.js";
+import { GetSurveyByIdUseCase } from "../../application/use-cases/survey/get-survey-by-id.usecase.js";
 import { SubmitSurveyUseCase } from "../../application/use-cases/survey/submit-survey.usecase.js";
 import { AuthController } from "../../interfaces/http/controllers/auth.controller.js";
 import { SurveyController } from "../../interfaces/http/controllers/survey.controller.js";
@@ -21,6 +24,7 @@ import { MongoVerificationTokenRepository } from "../repositories/mongo/mongo-ve
 import { BcryptService } from "../services/bcrypt.service.js";
 import { CryptoService } from "../services/crypto.service.js";
 import { JwtTokenService } from "../services/jwt-token.service.js";
+import { WinstonLogger } from "../services/winston.logger.js";
 import { envConfig } from "./env.js";
 
 // REPOSITORIOS
@@ -58,14 +62,16 @@ const tokenService = new CryptoService();
 export const jwtTokenService = new JwtTokenService(
   envConfig.accessTokenSecret,
   envConfig.refreshTokenSecret
-); 
+);
+export const logger = new WinstonLogger();
 
-// 2. Inyectar dependencias en los Casos de Uso
+// Inyectar dependencias en los Casos de Uso
 const registerUseCase = new RegisterUseCase(
   userRepository,
   bcryptService,
   tokenService,
-  unitOfWork
+  unitOfWork,
+  logger
 );
 
 const verifyEmailUseCase = new VerifyEmailUseCase(
@@ -82,15 +88,21 @@ const loginUseCase = new LoginUseCase(
   jwtTokenService,
   refreshTokenRepository,
   tokenService,
-  verificationTokenRepository
+  verificationTokenRepository,
+  logger
 );
 
-const createSurveyUseCase = new CreateSurveyUseCase(tokenService, unitOfWork);
+const createSurveyUseCase = new CreateSurveyUseCase(
+  tokenService,
+  unitOfWork,
+  logger
+);
 
 const startResponseSessionUseCase = new StartResponseSessionUseCase(
   tokenService,
   responseSessionRepository,
-  surveyRepository
+  surveyRepository,
+  logger
 );
 
 const submitSurveyUseCase = new SubmitSurveyUseCase(
@@ -100,7 +112,9 @@ const submitSurveyUseCase = new SubmitSurveyUseCase(
   tokenService,
   surveyStatsRepository,
   questionStatsRepository,
-  unitOfWork
+  unitOfWork,
+  surveyRepository,
+  logger
 );
 
 const abandonSurveyUseCase = new AbandonSurveyUseCase(
@@ -109,7 +123,28 @@ const abandonSurveyUseCase = new AbandonSurveyUseCase(
   logicRuleRepository,
   surveyStatsRepository,
   questionStatsRepository,
-  unitOfWork
+  unitOfWork,
+  logger
+);
+
+const getSurveyByIdUseCase = new GetSurveyByIdUseCase(
+  surveyRepository,
+  questionRepository,
+  logicRuleRepository
+);
+
+const refreshTokenUseCase = new RefreshTokenUseCase(
+  refreshTokenRepository,
+  jwtTokenService,
+  bcryptService,
+  logger
+);
+
+const getSurveyStatsByIdUseCase = new GetSurveyStatsByIdUseCase(
+  surveyRepository,
+  surveyStatsRepository,
+  questionStatsRepository,
+  questionRepository
 );
 
 // 3. Inyectar Casos de Uso en los Controladores
@@ -117,6 +152,7 @@ export const authController = new AuthController({
   registerUseCase,
   verifyEmailUseCase,
   loginUseCase,
+  refreshTokenUseCase,
 });
 
 export const surveyController = new SurveyController({
@@ -124,4 +160,6 @@ export const surveyController = new SurveyController({
   startResponseSessionUseCase,
   submitSurveyUseCase,
   abandonSurveyUseCase,
+  getSurveyByIdUseCase,
+  getSurveyStatsByIdUseCase,
 });
