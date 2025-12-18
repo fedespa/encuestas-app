@@ -1,24 +1,4 @@
 services:
-  mongo:
-    image: mongo:7
-    container_name: mongo_prod
-    restart: always
-    env_file:
-      - .env.production
-    volumes:
-      - ./mongo_data:/data/db
-      - ./mongo-keyfile:/data/configdb/mongo-keyfile
-      - ./rs-init.prod.sh:/scripts/rs-init.prod.sh:ro
-    ports:
-      - "27017:27017"
-    command: >
-      bash -c "
-      chmod 400 /data/configdb/mongo-keyfile &&
-      chown 999:999 /data/configdb/mongo-keyfile &&
-      /scripts/rs-init.prod.sh
-      "
-    networks:
-      - encuesta_net
   backend:
     build:
       context: .
@@ -29,13 +9,5 @@ services:
       - .env.production
     ports:
       - "3000:3000"
-    depends_on:
-      - mongo
-    networks:
-      - encuesta_net
-  
-networks:
-  encuesta_net:
-    driver: bridge
 volumes:
   mongo_data:

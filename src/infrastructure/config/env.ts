@@ -20,9 +20,6 @@ export function validateEnv() {
   ];
 
   const productionRequired = [
-    "MONGO_INITDB_ROOT_USERNAME",
-    "MONGO_INITDB_ROOT_PASSWORD",
-    "MONGO_APP_DB",
     "MONGO_APP_USER",
     "MONGO_APP_PASSWORD",
   ];

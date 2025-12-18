@@ -30,5 +30,4 @@ coverage/
 # Cache
 .cache/
 
-mongo-keyfile
 mongo_data/
