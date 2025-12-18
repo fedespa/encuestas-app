@@ -1,5 +1,5 @@
 import { RefreshTokenEntity } from "../../../domain/refresh-token/refresh-token.entity.js";
-import { UserNotFoundError } from "../../../domain/user/user.errors.js";
+import { AlreadyVerifiedUser, UserNotFoundError } from "../../../domain/user/user.errors.js";
 import type { IUserRepository } from "../../../domain/user/user.repository.js";
 import {
   VerificationTokenExpiredError,
@@ -40,6 +40,10 @@ export class VerifyEmailUseCase {
       throw new UserNotFoundError();
     }
 
+    if (user.isVerified) {
+      throw new AlreadyVerifiedUser();
+    }
+
     user.verifyEmail();
 
     const refreshTokenId = this.tokenService.generateUUID();
@@ -60,9 +64,9 @@ export class VerifyEmailUseCase {
     });
 
     await this.unitOfWork.execute(async (unitOfWork) => {
-      unitOfWork.auth.userRepository.update(user.id, user);
-      unitOfWork.auth.verificationTokenRepository.deleteByToken(input.token);
-      unitOfWork.auth.refreshTokenRepository.create(refreshTokenEntity);
+      await unitOfWork.auth.userRepository.update(user.id, user);
+      await unitOfWork.auth.verificationTokenRepository.deleteByToken(input.token);
+      await unitOfWork.auth.refreshTokenRepository.create(refreshTokenEntity);
     });
 
     return {

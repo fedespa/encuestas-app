@@ -51,7 +51,7 @@ export class RegisterUseCase {
     });
 
     await this.unitOfWork.execute(async (unitOfWork) => {
-      await unitOfWork.auth.userRepository.create(user),
+      await unitOfWork.auth.userRepository.create(user);
         await unitOfWork.auth.verificationTokenRepository.create(
           verificationToken
         );

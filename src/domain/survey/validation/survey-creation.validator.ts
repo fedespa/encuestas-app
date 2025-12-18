@@ -136,25 +136,25 @@ export class SurveyCreationValidator {
         "La encuesta debe tener al menos una pregunta. "
       );
 
-    // 1️⃣ Validar orden de preguntas
+    // Validar orden de preguntas
     this.validateSurveyOrdering(questions);
 
-    // 5️⃣ Acciones válidas
+    // Acciones válidas
     this.validateValidRuleActions(logicRules);
 
-    // 2️⃣ Validar duplicados y reglas ambiguas
+    // Validar duplicados y reglas ambiguas
     this.assertNoAmbiguousRule(logicRules);
 
-    // 3️⃣ Validar que reglas referencien preguntas válidas
+    // Validar que reglas referencien preguntas válidas
     this.validateRuleQuestionReferences(logicRules, questions);
 
-    // 4️⃣ Self-target no permitido
+    // Self-target no permitido
     this.validateNoSelfTargetRules(logicRules);
 
-    // 6️⃣ Saltos hacia adelante
+    // Saltos hacia adelante
     this.validateJumpTargetsAreForward(logicRules, questions);
 
-    // 7️⃣ Normalizar orden de reglas
+    // Normalizar orden de reglas
     const orderedRules = SurveyAuxValidator.getNormalizedRules(
       logicRules,
       questions

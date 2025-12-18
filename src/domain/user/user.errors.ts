@@ -30,3 +30,10 @@ export class UserNotVerifiedError extends AppError {
     this.verificationUrl = verificationUrl;
   }
 }
+
+export class AlreadyVerifiedUser extends AppError {
+  constructor() {
+    super("El usuario ya fue verificado. ", 403);
+    this.name = "AlreadyVerifiedUser";
+  }
+}

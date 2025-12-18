@@ -14,6 +14,7 @@ import type { HashService } from "../../services/hash.service.js";
 import type { JwtService } from "../../services/jwt.service.js";
 import type { TokenService } from "../../services/token.service.js";
 import type { ILoggerService } from "../../services/logger.service.js";
+import { envConfig } from "../../../infrastructure/config/env.js";
 
 export class LoginUseCase {
   constructor(
@@ -59,7 +60,7 @@ export class LoginUseCase {
 
       await this.verificationTokenRepository.create(verificationToken);
 
-      const verificationUrl = `http://localhost:3000/auth/verify?token=${token}`;
+      const verificationUrl = `${envConfig.corsOrigin}/auth/verify?token=${token}`;
       /**
        * 🔹 Nota de producción:
        * La URL de verificación se envia como parametro al error solo en demo.

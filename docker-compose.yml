@@ -27,8 +27,8 @@ services:
     image: mongo:7 
     container_name: rs-init
     volumes:
-      - ./rs-init.sh:/rs-init.sh # Monta el script
-    command: /rs-init.sh # Ejecuta el script
+      - ./rs-init.sh:/rs-init.sh
+    entrypoint: ["/bin/bash", "/rs-init.sh"]
     depends_on:
       - mongo
 

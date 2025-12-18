@@ -49,6 +49,7 @@ export class MongoUnitOfWork implements IUnitOfWork {
 
       return result;
     } catch (error) {
+      
       await session.abortTransaction();
       throw error;
     } finally {

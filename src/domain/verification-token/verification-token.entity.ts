@@ -50,14 +50,20 @@ export class VerificationTokenEntity {
   }
 
   static create(props: VerificationTokenProps) {
-    VerificationTokenEntity.validate(props);
+    const finalProps = {
+      ...props,
+      expiresAt: props.expiresAt ?? new Date(Date.now() + 1000 * 60 * 60 * 24),
+      createdAt: props.createdAt ?? new Date(),
+    };
+
+    VerificationTokenEntity.validate(finalProps);
 
     return new VerificationTokenEntity(
-      props.id,
-      props.userId,
-      props.token,
-      props.expiresAt ?? new Date(Date.now() + 1000 * 60 * 60 * 24),
-      props.createdAt ?? new Date()
+      finalProps.id,
+      finalProps.userId,
+      finalProps.token,
+      finalProps.expiresAt,
+      finalProps.createdAt
     );
   }
 }

@@ -147,7 +147,7 @@ const getSurveyStatsByIdUseCase = new GetSurveyStatsByIdUseCase(
   questionRepository
 );
 
-// 3. Inyectar Casos de Uso en los Controladores
+// Inyectar Casos de Uso en los Controladores
 export const authController = new AuthController({
   registerUseCase,
   verifyEmailUseCase,

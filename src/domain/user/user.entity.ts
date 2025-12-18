@@ -26,6 +26,7 @@ export class UserEntity {
     this.password = newPassword;
   }
 
+
   static create(props: UserProps) {
 
     UserEntity.validate(props);

@@ -255,18 +255,18 @@ export class SurveyResponseValidator {
     for (let i = 0; i < questionIndex; i++) {
       const prev = questions[i]!;
 
-      // 1) Si está saltada por jump_to → NO bloquea el flujo
+      // Si está saltada por jump_to → NO bloquea el flujo
       const skippedByJump = this.isJumpSkipped(prev.id, questions, activeJumps);
       if (skippedByJump) continue;
 
-      // 2) Si está oculta por reglas show/hide → NO bloquea el flujo
+      // Si está oculta por reglas show/hide → NO bloquea el flujo
       const visibilityState = this.getShowHideState(prev.id, rules, answerMap);
       const hiddenByRules = visibilityState === "hide";
       if (hiddenByRules) continue;
 
       if (!prev.required) continue;
 
-      // 3) Si está respondida → NO bloquea
+      // Si está respondida → NO bloquea
       const prevAnswered = answerMap.has(prev.id);
       if (prevAnswered) continue;
 

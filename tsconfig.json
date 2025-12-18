@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     // Paths
-    "rootDir": ".",
+    "rootDir": "src",
     "outDir": "./dist",
 
     // Environment
@@ -32,5 +32,12 @@
     // Misc
     "skipLibCheck": true
   },
-  "include": ["src", "tests"]
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "tests"
+  ]
 }

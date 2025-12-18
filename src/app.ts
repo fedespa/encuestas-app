@@ -7,7 +7,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "*", // Cambiar por frontend
+    origin: process.env.CORS_ORIGIN, 
     credentials: true,
   })
 );
@@ -18,11 +18,8 @@ app.use(cookieParser());
 
 export default app;
 
-// 1. Crear DockerFile (dockerizar backend)
-// 2. Subir la db a MongoDB atlas
-// 3. Subir backend a railway u otro
+
 // 4. Hacer CI (github actions).
 
 // Crear README
 
-// NO subir a produccion docker-compose.yml. 

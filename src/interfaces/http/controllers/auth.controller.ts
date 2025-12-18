@@ -4,6 +4,7 @@ import type { VerifyEmailUseCase } from "../../../application/use-cases/auth/ver
 import { VerificationTokenNotProvidedError } from "../../../domain/verification-token/verification-token.errors.js";
 import type { LoginUseCase } from "../../../application/use-cases/auth/login.usecase.js";
 import type { RefreshTokenUseCase } from "../../../application/use-cases/auth/refresh-token.usecase.js";
+import { envConfig } from "../../../infrastructure/config/env.js";
 
 export class AuthController {
   constructor(
@@ -25,7 +26,7 @@ export class AuthController {
     const { verificationToken } = registerResponse;
 
     // En demo: construyo la URL para mostrar al usuario
-    const verificationUrl = `http://localhost:3000/auth/verify?token=${verificationToken}`;
+    const verificationUrl = `${envConfig.corsOrigin}/auth/verify?token=${verificationToken}`;
 
     /**
      * 🔹 Nota de producción:

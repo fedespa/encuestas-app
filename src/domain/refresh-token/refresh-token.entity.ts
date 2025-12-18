@@ -36,14 +36,21 @@ export class RefreshTokenEntity {
   }
 
   static create(props: RefreshTokenProps) {
-    RefreshTokenEntity.validate(props);
+
+    const finalProps = {
+      ...props,
+      expiresAt: props.expiresAt ?? new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      createdAt: props.createdAt ?? new Date()
+    }
+
+    RefreshTokenEntity.validate(finalProps);
 
     return new RefreshTokenEntity(
-      props.id,
-      props.userId,
-      props.token,
-      props.expiresAt ?? new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-      props.createdAt ?? new Date()
+      finalProps.id,
+      finalProps.userId,
+      finalProps.token,
+      finalProps.expiresAt ?? new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      finalProps.createdAt ?? new Date()
     );
   }
 }

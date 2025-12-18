@@ -1,7 +1,7 @@
 import "dotenv/config";
-import { validateEnv } from "./infrastructure/config/env.js";
+import { envConfig, validateEnv } from "./infrastructure/config/env.js";
 
-validateEnv()
+validateEnv();
 
 import mongoose from "mongoose";
 import app from "./app.js";
@@ -17,8 +17,8 @@ import createSurveyRoutes from "./interfaces/http/routes/survey.routes.js";
 import rateLimit from "express-rate-limit";
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  limit: 10, 
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -26,7 +26,7 @@ const authLimiter = rateLimit({
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 80,
-  standardHeaders: true, 
+  standardHeaders: true,
   legacyHeaders: false,
 });
 
@@ -38,23 +38,28 @@ app.use("/survey", createSurveyRoutes(surveyController, jwtTokenService));
 
 app.use(errorHandler(logger));
 
-const PORT = process.env.PORT ?? 3000;
-const MONGO_URI =
-  process.env.MONGO_URI ??
-  "mongodb://admin:secret123@localhost:27017/?authMechanism=DEFAULT";
+const MONGO_URI = envConfig.mongoUri;
+const PORT = envConfig.port;
 
-(async () => {
+const connectWithRetry = async () => {
+
   try {
-    mongoose.set("debug", true);
-
-    await mongoose.connect(MONGO_URI);
-    console.log("🔌 Conectado a MongoDB");
+    await mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 10000, 
+      socketTimeoutMS: 45000,        
+      family: 4                      
+    });
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`Server running on http://localhost:${PORT}`);
     });
-  } catch (error) {
-    console.error("❌ Error al iniciar la app", error);
-    process.exit(1);
+    
+    console.log("✅ MongoDB conectado y autenticado");
+  } catch (error: any) {
+    console.error("Error de autenticación o conexión:", error.message);
+    console.log("Reintentando en 5 segundos...");
+    setTimeout(connectWithRetry, 5000);
   }
-})();
+};
+
+connectWithRetry();
