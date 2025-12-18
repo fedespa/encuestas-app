@@ -1,9 +1,50 @@
 services:
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    restart: always
+    command: mongod --bind_ip_all --replSet rs0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mongo-init:
+    image: mongo:7
+    container_name: mongo-init
+    depends_on:
+      mongo:
+        condition: service_healthy
+    entrypoint: >
+      mongosh --host mongo:27017 --eval "
+        try {
+          if (!rs.status().ok) {
+            rs.initiate({
+              _id: 'rs0',
+              members: [{ _id: 0, host: 'mongo:27017' }]
+            });
+            console.log('Replica Set inicializado con éxito');
+          }
+        } catch (e) {
+          if (e.message.includes('already initialized')) {
+            console.log('El Replica Set ya estaba activo');
+          } else {
+            // Reintenta el inicio básico si el anterior falló
+            rs.initiate(); 
+            console.log('Inicio básico forzado');
+          }
+        }
+      "
+
+  backend:
+    build: .
     container_name: backend_dev
+    restart: always
     ports:
       - "3000:3000"
     env_file:
@@ -12,25 +53,8 @@ services:
       - .:/app
       - /app/node_modules
     depends_on:
-      - mongo
-    command: npm run dev
-  mongo:
-    image: mongo:7
-    container_name: mongo
-    restart: always
-    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-  rs-init:
-    image: mongo:7 
-    container_name: rs-init
-    volumes:
-      - ./rs-init.sh:/rs-init.sh
-    entrypoint: ["/bin/bash", "/rs-init.sh"]
-    depends_on:
-      - mongo
-
+      mongo:
+        condition: service_healthy
+  
 volumes:
   mongo_data:

@@ -42,7 +42,6 @@ const MONGO_URI = envConfig.mongoUri;
 const PORT = envConfig.port;
 
 const connectWithRetry = async () => {
-
   try {
     await mongoose.connect(MONGO_URI, {
       serverSelectionTimeoutMS: 10000, 
