@@ -4,7 +4,7 @@ Backend de alto rendimiento para gestión de encuestas, construido con **Node.js
 
 ## 🛠️ Tecnologías
 
-- **Runtime**: Node.js 20+ (Alpine Linux en producción)
+- **Runtime**: Node.js 20+ 
 - **Lenguaje**: TypeScript
 - **Base de Datos**: MongoDB 7.0 con **Replica Set**
 - **Infraestructura**: Docker & Docker Compose
@@ -57,48 +57,55 @@ Esta aplicación permite **crear, responder y analizar encuestas** de forma flex
   - Implementación del patrón **Unit of Work** para manejar transacciones en **MongoDB**, garantizando consistencia de datos.
 
 ---
-chmod 400 mongo-keyfile
+
 
 Esta aplicación está diseñada para ser **robusta, extensible y segura**, manteniendo altos estándares de calidad tanto en su arquitectura como en su implementación.
 
 
 ## 🏗️ Características de Producción
 
-- **Replica Set Automatizado**: Configuración mediante scripts para habilitar Transacciones en MongoDB.
-- **Seguridad de Base de Datos**: Autenticación obligatoria con separación de roles (Root vs. App User).
-- **Docker Multi-stage**: El `Dockerfile.prod` optimiza el tamaño de la imagen final, separando las dependencias de compilación de las de ejecución.
-
+- **Backend (VPS)**: Ejecutado en un contenedor Docker optimizado mediante *multi-stage builds*. 
+- **Base de Datos (Cloud)**: MongoDB Atlas proporciona un clúster gestionado con tres nodos en réplica, lo que asegura que la base de datos nunca se detenga y soporte transacciones complejas de forma nativa.
 ---
 
 ## 🚀 Despliegue en Producción
 
-
 ### 1. Requisitos Previos
 - Docker y Docker Compose instalados.
-- Puerto `3000` (API) y `27017` (MongoDB - opcional) disponibles.
+- Tener una cuenta en **MongoDB Atlas** y obtener la URI de conexión (`mongodb+srv://...`).
 
-### 2. Configuración de Seguridad (Keyfile)
-MongoDB requiere una clave compartida para los nodos del Replica Set.
-
-## 3. Variables de Entorno
+## 2. Variables de Entorno
 Crea tu archivo de producción basado en el archivo de ejemplo:
 
 ```bash
 cp .env.example .env.production
 ```
 
-## 4. Lanzamiento de Servicios
+## 3. Lanzamiento con Docker Compose
 Construye las imágenes e inicia los contenedores en segundo plano:
 
 ```bash
 docker compose -f docker-compose.prod.yml up --build -d
 ```
+---
+
+## 💻 Desarrollo Local
+
+## 1. Instalar dependencias
+## 2. Levantar base de datos local:
+
+```bash
+docker compose up mongo -d
+```
+## 3. Ejecutar aplicación: 
+```bash
+npm run dev
+```
 
 ## 📁 Estructura de Archivos de Infraestructura
 
 - **Dockerfile.prod**: Instrucciones de build optimizadas para producción en dos etapas (builder y runner).
-- **docker-compose.prod.yml**: Orquestación de servicios (Node + Mongo) con redes privadas y volúmenes persistentes.
-- **rs-init.prod.sh**: Script de automatización para la inicialización del Replica Set y la creación de usuarios.
+- **docker-compose.prod.yml**: Configuración simplificada que levanta exclusivamente el servicio de backend en producción.
 - **.gitignore**: Configuración para excluir `node_modules`, archivos compilados, secretos `.env` y claves de seguridad.
 
 
