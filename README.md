@@ -49,12 +49,15 @@ Esta aplicación permite **crear, responder y analizar encuestas** de forma flex
   - Implementación de **tests unitarios** para asegurar la estabilidad y correcto funcionamiento.
 
 - 🧾 **Logging**
-  - Integración de **Winston Logger** para trazabilidad y monitoreo de eventos.
+  - Integración de **Winston Logger** para trazabilidad y monitoreo de eventos.### 2. Configuración de Seguridad (Keyfile)
+  MongoDB requiere una clave compartida para la comunicación interna del clúster. Ejecuta este comando en la raíz del proyecto:
+  
 
 - 🔄 **Persistencia y Transacciones**
   - Implementación del patrón **Unit of Work** para manejar transacciones en **MongoDB**, garantizando consistencia de datos.
 
 ---
+chmod 400 mongo-keyfile
 
 Esta aplicación está diseñada para ser **robusta, extensible y segura**, manteniendo altos estándares de calidad tanto en su arquitectura como en su implementación.
 
@@ -75,7 +78,7 @@ Esta aplicación está diseñada para ser **robusta, extensible y segura**, mant
 - Puerto `3000` (API) y `27017` (MongoDB - opcional) disponibles.
 
 ### 2. Configuración de Seguridad (Keyfile)
-MongoDB requiere una clave compartida para los nodos del Replica Set. Ejecuta:
+MongoDB requiere una clave compartida para los nodos del Replica Set.
 
 ## 3. Variables de Entorno
 Crea tu archivo de producción basado en el archivo de ejemplo:
